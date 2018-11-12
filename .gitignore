@@ -1,0 +1,8 @@
+*.mod.*
+*.ko
+*.o
+*.cmd
+Module.symvers
+modules.order
+.tmp_versions
+iproute2/
