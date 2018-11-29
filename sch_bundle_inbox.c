@@ -100,10 +100,10 @@
   changed the limit is not effective anymore.
 */
 
-#define BUNDLE_GROUP 42
+#define BUNDLE_GROUP 22
 #define NETLINK_USER 30
 // Mark 1 out of every 100 packets, on average
-#define PACKET_SAMPLE_RATE 100 
+#define PACKET_SAMPLE_RATE 100
 
 struct __attribute__((packed, aligned(4))) FeedbackMsg {
 	u32 bundle_id;
@@ -164,7 +164,7 @@ void send_to_dp(struct tbf_sched_data *q, char *msg, int msg_size) {
 		GFP_NOWAIT
 	);
 	if (res < 0) {
-		printk(KERN_ERR "failed to send netlink message\n");
+		printk(KERN_ERR "failed to send netlink message %d\n", res);
 	}
 }
 
@@ -527,7 +527,7 @@ static int tbf_init(struct Qdisc *sch, struct nlattr *opt)
 	q->epoch_bytes_sent = 0;
 	q->epoch_pkts_sent = 0;
 
-	q->nl_sock = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
+	q->nl_sock = netlink_kernel_create(&init_net, NETLINK_USERSOCK, &cfg);
 	if (!q->nl_sock) {
 		printk(KERN_INFO "bundle_inbox: error creating netlink socket\n");
 		return -EINVAL;
@@ -541,7 +541,9 @@ static int tbf_init(struct Qdisc *sch, struct nlattr *opt)
 static void tbf_destroy(struct Qdisc *sch)
 {
   struct tbf_sched_data *q = qdisc_priv(sch);
-
+  if (q->nl_sock) {
+    netlink_kernel_release(q->nl_sock);
+  }
   qdisc_watchdog_cancel(&q->watchdog);
   qdisc_destroy(q->qdisc);
 }
@@ -552,7 +554,7 @@ static int tbf_dump(struct Qdisc *sch, struct sk_buff *skb)
   struct nlattr *nest;
   struct tc_tbf_qopt opt;
 
-	printk(KERN_INFO "bundle_inbox: dump\n");
+  printk(KERN_INFO "bundle_inbox: dump\n");
   sch->qstats.backlog = q->qdisc->qstats.backlog;
   nest = nla_nest_start(skb, TCA_OPTIONS);
   if (nest == NULL)
@@ -670,7 +672,7 @@ static int __init tbf_module_init(void)
 
 static void __exit tbf_module_exit(void)
 {
-	printk(KERN_INFO "bundle_inbox: exit\n");
+  printk(KERN_INFO "bundle_inbox: exit\n");
   unregister_qdisc(&tbf_qdisc_ops);
 }
 module_init(tbf_module_init)
