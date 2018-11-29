@@ -4,7 +4,7 @@ if [ -d "iproute2" ]; then
     echo "> iproute2 already exists"
 else
     sudo apt-get install libdb-dev
-    git clone https://github.com/shemminger/iproute2.git
+    git clone https://github.com/akshayknarayan/iproute2.git
     cd iproute2
     ./configure
     cd ..
