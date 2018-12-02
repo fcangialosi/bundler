@@ -21,6 +21,15 @@
 - `X` is the rate in Mbps (I've been using X/100 for burst, but this pretty arbitrary)
 - Latency choice is also arbitrary and may need to be adjusted but seems to work well for now
 
+5. Run qdisc show using the local version of `tc` we just compiled and note the qdisc's major and minor handle. You will need to provide these to the userspace bundler so that it knows which qdisc to communicate with. For example:
+
+```bash
+$ cd /PATH/TO/BUNDLER
+$ sudo env TC_LIB_DIR=/PATH/TO/BUNDLER/iproute2/tc ./iproute2/tc/tc qdisc show
+qdisc bundle_inbox handle(maj=0x8001,min=0x0): root refcnt 3 rate 100000Kbit burst 131050b lat 50.0ms
+                          ^^^^^^^^^^^^^^^^^^
+```
+
 
 ## Requirements
 
