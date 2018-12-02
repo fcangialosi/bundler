@@ -34,4 +34,5 @@ qdisc bundle_inbox handle(maj=0x8001,min=0x0): root refcnt 3 rate 100000Kbit bur
 ## Requirements
 
 This code was written for Linux v4.13 (default on Ubuntu 17.10). It should work with other versions,
-but may require a slight modification to compile since the qdisc API changed slightly.
+but may require a slight modification to compile since the qdisc API changed slightly. We have
+made these modifications for v4.14 (checkout the 4.14 branch instead of master).
